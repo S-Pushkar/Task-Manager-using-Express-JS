@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB Assignment 4</title>
+    <style>
+        body {
+            background-color: rgb(41, 41, 41);
+            color: aliceblue;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        h1 {
+            text-align: center;
+            color: goldenrod;
+        }
+        h2 {
+            text-align: center;
+            color: blueviolet;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        button {
+            margin: 6px;
+            border-radius: 4px;
+            padding: 4px;
+        }
+        .forms {
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 4px;
+        }
+        input {
+            width: 170px;
+            border-radius: 4px;
+            padding: 1.5px;
+            margin: 2px;
+        }
+        span {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Manager</h1>
+    <div class="create">
+        <h2>Create a New Task</h2>
+        <form onsubmit="createSubmit()">
+            <div class="forms">
+                <label>Task Name:<br />
+                    <input id="create1" type="text" name="task_name" required autofocus />
+                </label>
+                <label>Description:<br />
+                    <input id="create2" type="text" name="description" required>
+                </label>
+                <label>Status:<br />
+                    <input id="create3" type="text" name="status" required />
+                </label>
+                <label>Due Date:<br />
+                    <input id="create4" type="date" name="due_date" required />
+                </label>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+        </form>
+    </div>
+
+    <div class="read">
+        <h2>Read All Tasks</h2>
+        <div style="text-align: center;">
+            <div class="read-data"></div>
+            <button onclick="read()">Read</button>
+            <button id="clearButton">Clear</button>
+        </div>
+    </div>
+
+    <div class="update">
+        <h2>Update a Task</h2>
+        <form onsubmit="updateSubmit()">
+            <div class="forms">
+                <label>Task Name:<br />
+                    <input id="update1" type="text" name="task_name" required />
+                </label>
+                <label>Description:<br />
+                    <input id="update2" type="text" name="description" required>
+                </label>
+                <label>Status:<br />
+                    <input id="update3" type="text" name="status" required />
+                </label>
+                <label>Due Date:<br />
+                    <input id="update4" type="date" name="due_date" required />
+                </label>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+        </form>
+    </div>
+
+</body>
+<script>
+    let formTags = document.querySelectorAll('form');
+    
+    formTags[0].addEventListener('submit', (e) => {
+        e.preventDefault();
+    });
+    
+    formTags[1].addEventListener('submit', (e) => {
+        e.preventDefault();
+    });
+    
+    document.getElementById('clearButton').addEventListener('click', () => {
+        document.getElementsByClassName('read-data')[0].innerHTML = '';
+    });
+
+    async function createSubmit() {
+        let promise = new Promise((resolve, reject) => {
+            t_name = document.getElementById('create1').value;
+            desc = document.getElementById('create2').value;
+            stat = document.getElementById('create3').value;
+            due = document.getElementById('create4').value;
+            resolve('');
+        })
+        .then(async (res) => {
+            const connection = await fetch("http://localhost:3000/create",{
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    task_name: t_name, 
+                    description: desc, 
+                    status: stat, 
+                    due_date: due
+                }),
+            });
+            const data = await connection.json();
+            alert(data.message);
+        });
+    }
+
+    async function read() {
+        const connection = await fetch("http://localhost:3000/read", {
+            method: 'GET',
+        });
+        const data = await connection.json();
+        if(data.success) {
+            let tag = document.getElementsByClassName('read-data')[0];
+            let str = "";
+            data.arrayData.map((value, index) => {
+                str += `<span>Task Name:</span> ${value.task_name} <br><span>Description:</span> ${value.description} <br><span>Status:</span> ${value.status} <br><span>Due Date:</span> ${value.due_date} <br><br>`;
+            });
+            tag.innerHTML = str;
+        }
+        else {
+            alert(data.message);
+        }
+    }
+
+
+    async function updateSubmit() {
+        let promise = new Promise((resolve, reject) => {
+            t_name1 = document.getElementById('update1').value;
+            desc1 = document.getElementById('update2').value;
+            stat1 = document.getElementById('update3').value;
+            due1 = document.getElementById('update4').value;
+            resolve('');
+        })
+        .then(async (res) => {
+            const connection = await fetch("http://localhost:3000/update",{
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    task_name: t_name1, 
+                    description: desc1, 
+                    status: stat1, 
+                    due_date: due1
+                }),
+            });
+            const data = await connection.json();
+            alert(data.message);
+        });
+    }
+
+</script>
+</html>
